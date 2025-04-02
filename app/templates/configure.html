@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Сформировать конфигурацию ПК{% endblock %}
+
+{% block content %}
+    <section>
+        <div id="configuration">
+            <h2>Сформировать конфигурацию ПК</h2>
+            <div id="survey">
+                <!-- Счетчик вопросов -->
+                <div class="question-counter">
+                    [[ currentQuestion ]] / [[ questions.length ]]
+                </div>
+    
+                <!-- Вопросы -->
+                <div v-for="(question, index) in questions" 
+                    v-show="currentQuestion === index + 1" 
+                    class="question" 
+                    :key="'question-' + index">
+                    <h3>[[ question.text ]]</h3>
+                    <div class="options">
+                        <label v-for="option in question.options" 
+                            :key="'option-' + option.id" 
+                            :class="{ selected: selectedAnswers[index] === option.id }">
+                            <input type="radio" 
+                                v-model="selectedAnswers[index]" 
+                                :value="option.id" 
+                                hidden>
+                            [[ option.text ]]
+                        </label>
+                    </div>
+                </div>
+    
+                <!-- Навигация -->
+                <div class="navigation">
+                    <button @click="prevQuestion" :disabled="currentQuestion === 1">Назад</button>
+                    <button v-if="currentQuestion < questions.length" @click="nextQuestion">Далее</button>
+                    <button v-else @click="submitSurvey" :disabled="!isFormComplete">Отправить</button>
+                </div>
+            </div>
+            <br>
+            <!-- <h2>Конфигурация:</h2>
+            <p>Процессор: <strong v-if="cpu">[[ cpu ]]</strong><span v-else>Пока данных нет</span></p>
+            <p>Видеокарта: <strong v-if="gpu">[[ gpu ]]</strong><span v-else>Пока данных нет</span></p>
+            <p>Объем ОЗУ: <strong v-if="ram">[[ ram ]]</strong><span v-else>Пока данных нет</span></p>
+            <p>Мощность блока питания: <strong v-if="psu">[[ psu ]]</strong><span v-else>Пока данных нет</span></p> -->
+            <div class="pc-config config-fade-in">
+                <h2 class="pc-config-title">Конфигурация ПК</h2>
+                
+                <div class="component">
+                    <div class="component-name">Процессор</div>
+                    <div class="component-details">
+                        <div v-if="cpu">
+                            <div class="detail-item">
+                                <span class="detail-label">Модель</span>
+                                <span class="detail-value">[[ cpu ]]</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Ядра/Потоки</span>
+                                <span class="detail-value">[[ cpu.cores ]]/[[ cpu.threads ]]</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Частота</span>
+                                <span class="detail-value">[[ cpu.base_clock ]]/[[ cpu.boost_clock ]] GHz</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">TDP</span>
+                                <span class="detail-value">[[ cpu.tdp ]] W</span>
+                            </div>
+                        </div>
+                        <div v-else class="detail-item">
+                            <span class="detail-value">Пока данных нет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="component">
+                    <div class="component-name">Видеокарта</div>
+                    <div class="component-details">
+                        <div v-if="gpu">
+                            <div class="detail-item">
+                                <span class="detail-label">Модель</span>
+                                <span class="detail-value">[[ gpu ]]</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">VRAM</span>
+                                <span class="detail-value">[[ gpu.vram ]] GB</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">TDP</span>
+                                <span class="detail-value">[[ gpu.tdp ]] W</span>
+                            </div>
+                        </div>
+                        <div v-else class="detail-item">
+                            <span class="detail-value">Пока данных нет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="component">
+                    <div class="component-name">Оперативная память</div>
+                    <div class="component-details">
+                        <div v-if="ram" class="detail-item">
+                            <span class="detail-label">Объем</span>
+                            <span class="detail-value">[[ ram.size ]] GB</span>
+                        </div>
+                        <div v-else class="detail-item">
+                            <span class="detail-value">Пока данных нет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="component">
+                    <div class="component-name">Блок питания</div>
+                    <div class="component-details">
+                        <div v-if="psu" class="detail-item">
+                            <span class="detail-label">Мощность</span>
+                            <span class="detail-value">[[ psu.wattage ]] W</span>
+                        </div>
+                        <div v-else class="detail-item">
+                            <span class="detail-value">Пока данных нет</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+{% endblock %}

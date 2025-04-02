@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Оценить вашу конфигурацию{% endblock %}
+
+{% block content %}
+    <section>
+        <h2>Оценить вашу конфигурацию</h2>
+        <form>
+            <select v-model="selectedCpu">
+                <option v-for="cpu in cpus" :value="cpu.name">{{ cpu.name }}</option>
+            </select>
+            <button type="submit">Оценить</button>
+        </form>
+    </section>
+{% endblock %}

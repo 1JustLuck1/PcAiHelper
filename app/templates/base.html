@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>PC Configurator - {% block title %}{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <h1>PC AI Configurator</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Домой</a> |
+            <a href="{{ url_for('configure') }}">Сформировать конфигурацию ПК</a> |
+            <a href="{{ url_for('evaluate') }}">Оценить вашу конфигурацию</a> |
+            <a href="{{ url_for('info') }}">Информация по конфигурации ПК</a> |
+            <a href="{{ url_for('about') }}">Инфо</a>
+        </nav>
+
+        {% block content %}{% endblock %}
+
+        <footer>
+            <p><span id="current-year"></span> PC AI Configurator. Дипломный проект.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
