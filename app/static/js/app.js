@@ -47,9 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         id: 5,
                         text: "Желаемый вендор видеокарты?",
                         options: [
-                            { id: "NVIDIA", text: "NVIDIA" },
-                            { id: "AMD", text: "AMD" },
-                            { id: "Intel", text: "Intel" }
+                            { id: "nvidia", text: "NVIDIA" },
+                            { id: "amd", text: "AMD" },
+                            { id: "intel", text: "Intel" }
                         ]
                     },
                     {
@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 ],
                 cpu: "",
                 gpu: "",
+                psu: "",
+                cpudata: [],
+                gpudata: []
             }
         },
         created() {
@@ -105,12 +108,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log("Data received:", data);
                     this.cpu = data.cpu;
                     this.gpu = data.gpu;
+                    this.cpudata = data.cpud;
+                    this.gpudata = data.gpud;
+                    this.psu = data.total_tdp
                 })
                 .catch(error => console.error("Fetch error:", error));
             }
         }
     }).mount('#configuration');
     
+    // Vue.createApp({
+
+    // }).mount('#evaluate')
+
     Vue.createApp({
         delimiters: ['[[', ']]'],
         data() {

@@ -57,15 +57,15 @@
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Ядра/Потоки</span>
-                                <span class="detail-value">[[ cpu.cores ]]/[[ cpu.threads ]]</span>
+                                <span class="detail-value">[[ cpudata.cores ]]/[[ cpudata.threads ]]</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Частота</span>
-                                <span class="detail-value">[[ cpu.base_clock ]]/[[ cpu.boost_clock ]] GHz</span>
+                                <span class="detail-value">[[ cpudata.base_clock ]]/[[ cpudata.boost_clock ]] GHz</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">TDP</span>
-                                <span class="detail-value">[[ cpu.tdp ]] W</span>
+                                <span class="detail-value">[[ cpudata.tdp ]] W</span>
                             </div>
                         </div>
                         <div v-else class="detail-item">
@@ -84,11 +84,11 @@
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">VRAM</span>
-                                <span class="detail-value">[[ gpu.vram ]] GB</span>
+                                <span class="detail-value">[[ gpudata.vram ]] GB</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">TDP</span>
-                                <span class="detail-value">[[ gpu.tdp ]] W</span>
+                                <span class="detail-value">[[ gpudata.tdp ]] W</span>
                             </div>
                         </div>
                         <div v-else class="detail-item">
@@ -115,7 +115,7 @@
                     <div class="component-details">
                         <div v-if="psu" class="detail-item">
                             <span class="detail-label">Мощность</span>
-                            <span class="detail-value">[[ psu.wattage ]] W</span>
+                            <span class="detail-value">[[ psu ]] W</span>
                         </div>
                         <div v-else class="detail-item">
                             <span class="detail-value">Пока данных нет</span>

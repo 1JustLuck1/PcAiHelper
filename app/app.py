@@ -6,6 +6,9 @@ import joblib
 from tensorflow import keras
 from tensorflow.keras.models import load_model
 import pandas as pd
+from service import get_components_data
+import json
+
 
 app = Flask(__name__)
 
@@ -39,16 +42,16 @@ def load_model_app(model_name):
 
 # Загрузка моделей при старте приложения
 try:
-    cpu_preload_model = load_model_app('cpu_preload_predictor')
+    cpu_preload_model = load_model_app('cpu_preload_predictor') # Обогащение опросных данных дополнительными
     gpu_preload_model = load_model_app('gpu_preload_predictor')
 
-    cpu_main_preprocessor =  load_model_app('cpu_main_preprocessor')
+    cpu_main_preprocessor =  load_model_app('cpu_main_preprocessor') #препроцессинг (энкодинг)
     gpu_main_preprocessor =  load_model_app('gpu_main_preprocessor')
 
-    cpu_main_model = load_model_app('cpu_main_model')
+    cpu_main_model = load_model_app('cpu_main_model') #предсказание mark показателя
     gpu_main_model = load_model_app('gpu_main_model')
 
-    mark_to_cpu_model = load_model_app('cpu_mark_to_cpu_model')
+    mark_to_cpu_model = load_model_app('cpu_mark_to_cpu_model') # перевод mark показателя в модель
     mark_to_gpu_model = load_model_app('gpu_mark_to_gpu_model')
 
     print(f"INFO ---> Модели успешно загружены!")
@@ -146,10 +149,15 @@ def api_configure():
 
                 cpu_main_data = cpu_main_model.predict(cpu_main_processed_data)[0][0].tolist()
 
-                df_cpu_mark_value = pd.DataFrame({'cpuMark': [cpu_main_data]})
+                cpu_vendor_encoder = mark_to_cpu_model['vendor_encoder'].transform([fields[3]])
+
+                df_cpu_mark_value = pd.DataFrame({
+                    'cpuMark': [cpu_main_data],
+                    'vendor_encoded': cpu_vendor_encoder
+                    })
 
                 final_cpu_model = mark_to_cpu_model['model'].predict(df_cpu_mark_value)
-                cpu = mark_to_cpu_model['label_encoder'].inverse_transform(final_cpu_model)[0]
+                cpu = mark_to_cpu_model['cpuName_encoder'].inverse_transform(final_cpu_model)[0]
 
                 # print(cpu)
             except Exception as e:
@@ -160,16 +168,28 @@ def api_configure():
 
                 gpu_main_data = gpu_main_model.predict(gpu_main_processed_data)[0][0].tolist()
 
-                df_gpu_mark_value = pd.DataFrame({'gpuMark': [gpu_main_data]})
+                gpu_vendor_encoder = mark_to_gpu_model['vendor_encoder'].transform([fields[4]])
+
+                df_gpu_mark_value = pd.DataFrame({
+                    'gpuMark': [gpu_main_data],
+                    'vendor_encoded': gpu_vendor_encoder
+                    })
 
                 final_gpu_model = mark_to_gpu_model['model'].predict(df_gpu_mark_value)
-                gpu = mark_to_gpu_model['label_encoder'].inverse_transform(final_gpu_model)[0]
+                gpu = mark_to_gpu_model['gpuName_encoder'].inverse_transform(final_gpu_model)[0]
 
                 # print(gpu)
             except Exception as e:
                 print("GPU MODEL ERROR ---> ", str(e))
 
-            return jsonify({"cpu": cpu, "gpu": gpu})
+            cpudata, gpudata, total_tdp = get_components_data(cpu, gpu)
+            
+            cpudata = json.dumps(cpudata)
+            gpudata = json.dumps(gpudata)
+            cpu_json = json.loads(cpudata)
+            gpu_json = json.loads(gpudata)
+
+            return jsonify({"cpu": cpu, "gpu": gpu, "total_tdp": total_tdp, "cpud": cpu_json, "gpud": gpu_json})
         except Exception as e:
             # print(str(e))
             return jsonify({"error": str(e)}), 500
@@ -177,16 +197,22 @@ def api_configure():
 @app.route('/api/cpus')
 def get_cpus():
     conn = get_db_connection()
-    cpus = conn.execute('SELECT * FROM cpus').fetchall()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM cpus')
+        cpus = cursor.fetchall()
+    cursor.close()
     conn.close()
-    return jsonify([dict(cpu) for cpu in cpus])
+    return jsonify(cpus)
 
-# @app.route('/api/gpus')
-# def get_gpus():
-#     conn = get_db_connection()
-#     gpus = conn.execute('SELECT * FROM gpus').fetchall()
-#     conn.close()
-#     return jsonify([dict(gpu) for gpu in gpus])
+@app.route('/api/gpus')
+def get_gpus():
+    conn = get_db_connection()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM gpus')
+        gpus = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(gpus)
 
 if __name__ == '__main__':
     app.run(debug=True)
