@@ -65,7 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 gpu: "",
                 psu: "",
                 cpudata: [],
-                gpudata: []
+                gpudata: [],
+                cpu_links: [],
+                gpu_links: []
             }
         },
         created() {
@@ -110,7 +112,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.gpu = data.gpu;
                     this.cpudata = data.cpud;
                     this.gpudata = data.gpud;
-                    this.psu = data.total_tdp
+                    this.psu = data.total_tdp;
+                    this.cpu_links = data.cpu_links;
+                    this.gpu_links = data.gpu_links
                 })
                 .catch(error => console.error("Fetch error:", error));
             }
@@ -135,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         В рендеринге GPU важнее, чем в других задачах, и работает значительно быстрее CPU. Лучший выбор — NVIDIA из-за CUDA, которая эффективнее OpenCL (AMD). Если приложение поддерживает CUDA, предпочтительнее NVIDIA.
 
                         <b>Оперативная память (ОЗУ)</b>
-                        ОЗУ не главный ограничивающий фактор. Минимум — 8 ГБ, лучше больше для 3D-моделирования. DDR5 в двух- или четырёхканальной конфигурации даёт небольшой прирост.
+                        ОЗУ не главный ограничивающий фактор. Минимум — 8 ГБ, лучше больше для 3D-моделирования. DDR5 в двух- или четырёхканальной конфигурации даёт ощутимый прирост.
 
                         <b>Накопители</b>
 

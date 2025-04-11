@@ -40,7 +40,7 @@ def load_model_app(model_name):
     else:
         raise ValueError(f"Unsupported model format: {os.path.splitext(model_path)[1]}")
 
-# Загрузка моделей при старте приложения
+# Загрузка моделей
 try:
     cpu_preload_model = load_model_app('cpu_preload_predictor') # Обогащение опросных данных дополнительными
     gpu_preload_model = load_model_app('gpu_preload_predictor')
@@ -65,6 +65,25 @@ except Exception as e:
     gpu_main_model = None
     mark_to_cpu_model = None
     mark_to_gpu_model = None
+
+def get_links_for_components(cpu, gpu):
+    cpu_links = {
+        'DNS': f'https://www.dns-shop.ru/search/?q={cpu}',
+        'OZON': f'https://www.ozon.ru/search/?text={cpu}',
+        'Yandex market': f'https://market.yandex.ru/search?text={cpu}',
+        'Citilink': f'https://www.citilink.ru/search/?text={cpu}',
+        'Regard': f'https://www.regard.ru/catalog?search={cpu}'
+    }
+
+    gpu_links = {
+        'DNS': f'https://www.dns-shop.ru/search/?q={gpu}',
+        'OZON': f'https://www.ozon.ru/search/?text={gpu}',
+        'Yandex market': f'https://market.yandex.ru/search?text={gpu}',
+        'Citilink': f'https://www.citilink.ru/search/?text={gpu}',
+        'Regard': f'https://www.regard.ru/catalog?search={gpu}'
+    }
+
+    return cpu_links, gpu_links
 
 @app.route('/')
 def index():
@@ -149,6 +168,9 @@ def api_configure():
 
                 cpu_main_data = cpu_main_model.predict(cpu_main_processed_data)[0][0].tolist()
 
+                if fields[5] == '1':
+                    cpu_main_data = cpu_main_data * 1.25
+
                 cpu_vendor_encoder = mark_to_cpu_model['vendor_encoder'].transform([fields[3]])
 
                 df_cpu_mark_value = pd.DataFrame({
@@ -167,6 +189,8 @@ def api_configure():
                 gpu_main_processed_data = gpu_main_preprocessor.transform(data_gpu_main)
 
                 gpu_main_data = gpu_main_model.predict(gpu_main_processed_data)[0][0].tolist()
+                if fields[5] == '1':
+                    gpu_main_data = gpu_main_data * 1.25
 
                 gpu_vendor_encoder = mark_to_gpu_model['vendor_encoder'].transform([fields[4]])
 
@@ -189,7 +213,20 @@ def api_configure():
             cpu_json = json.loads(cpudata)
             gpu_json = json.loads(gpudata)
 
-            return jsonify({"cpu": cpu, "gpu": gpu, "total_tdp": total_tdp, "cpud": cpu_json, "gpud": gpu_json})
+            cpu_links, gpu_links = get_links_for_components(cpu, gpu)
+
+            cpu_links = json.loads(json.dumps(cpu_links))
+            gpu_links = json.loads(json.dumps(gpu_links))
+
+            return jsonify({
+                "cpu": cpu,
+                "gpu": gpu,
+                "total_tdp": total_tdp,
+                "cpud": cpu_json,
+                "gpud": gpu_json,
+                "cpu_links": cpu_links,
+                "gpu_links": gpu_links
+            })
         except Exception as e:
             # print(str(e))
             return jsonify({"error": str(e)}), 500

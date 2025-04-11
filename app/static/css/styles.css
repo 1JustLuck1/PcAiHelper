@@ -290,7 +290,25 @@ input:hover, select:hover {
     font-size: 16px;
     color: #ffffff;
 }
+/* Стили только для блока с ссылками */
+.links-row {
+    margin-bottom: 15px; /* Увеличиваем отступ снизу */
+}
 
+.links-row .detail-label {
+    margin-bottom: 8px; /* Отступ снизу для label */
+}
+
+.links-row .detail-value {
+    display: inline-flex; /* Размещаем ссылки в ряд */
+    flex-wrap: wrap; /* Разрешаем перенос при нехватке места */
+    gap: 8px; /* Отступ между ссылками */
+}
+
+.links-row .detail-value a.button {
+    display: inline-block; /* Корректное отображение кнопок */
+    white-space: nowrap; /* Запрещаем перенос текста внутри кнопки */
+}
 /* Адаптивность */
 @media (max-width: 768px) {
     .component-details {

@@ -67,6 +67,12 @@
                                 <span class="detail-label">TDP</span>
                                 <span class="detail-value">[[ cpudata.tdp ]] W</span>
                             </div>
+                            <div class="detail-item links-row">
+                                <span class="detail-label">Ссылки</span>
+                                <span v-for="link, shop in cpu_links" class="detail-value">
+                                    <a :href="link" target="_blank" class="button">[[ shop ]]</a>
+                                </span>
+                            </div>
                         </div>
                         <div v-else class="detail-item">
                             <span class="detail-value">Пока данных нет</span>
@@ -89,6 +95,12 @@
                             <div class="detail-item">
                                 <span class="detail-label">TDP</span>
                                 <span class="detail-value">[[ gpudata.tdp ]] W</span>
+                            </div>
+                            <div class="detail-item links-row">
+                                <span class="detail-label">Ссылки</span>
+                                <span v-for="link, shop in gpu_links" class="detail-value">
+                                    <a :href="link" target="_blank" class="button">[[ shop ]]</a>
+                                </span>
                             </div>
                         </div>
                         <div v-else class="detail-item">
