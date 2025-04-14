@@ -6,6 +6,8 @@
     <section>
         <div id="configuration">
             <h2>Сформировать конфигурацию ПК</h2>
+            <p v-if="loading">Загрузка данных...</p>
+            <p v-if="error" style="color: red;">Вы задали нерорректные требования - модель не может их обработать! Ошибка: [[ error ]]</p>
             <div id="survey">
                 <!-- Счетчик вопросов -->
                 <div class="question-counter">
@@ -17,7 +19,10 @@
                     v-show="currentQuestion === index + 1" 
                     class="question" 
                     :key="'question-' + index">
-                    <h3>[[ question.text ]]</h3>
+                    <div class="question-header">
+                        <h3>[[ question.text ]]</h3>
+                        <span class="hint-trigger" @click="showHint(question.hint)">?</span>
+                    </div>
                     <div class="options">
                         <label v-for="option in question.options" 
                             :key="'option-' + option.id" 
@@ -30,7 +35,16 @@
                         </label>
                     </div>
                 </div>
-    
+
+                <!-- Модальное окно для подсказки -->
+                <div class="hint-modal" v-if="activeHint" @click.self="activeHint = ''">
+                    <div class="hint-content">
+                        <p><b>Пояснение</b></p>
+                        <p>[[ activeHint ]]</p>
+                        <button class="default-button" @click="activeHint = ''">Закрыть</button>
+                    </div>
+                </div>
+        
                 <!-- Навигация -->
                 <div class="navigation">
                     <button @click="prevQuestion" :disabled="currentQuestion === 1">Назад</button>
@@ -44,6 +58,8 @@
             <p>Видеокарта: <strong v-if="gpu">[[ gpu ]]</strong><span v-else>Пока данных нет</span></p>
             <p>Объем ОЗУ: <strong v-if="ram">[[ ram ]]</strong><span v-else>Пока данных нет</span></p>
             <p>Мощность блока питания: <strong v-if="psu">[[ psu ]]</strong><span v-else>Пока данных нет</span></p> -->
+
+            <!-- Отображение конфигурации -->
             <div class="pc-config config-fade-in">
                 <h2 class="pc-config-title">Конфигурация ПК</h2>
                 
@@ -114,7 +130,7 @@
                     <div class="component-details">
                         <div v-if="ram" class="detail-item">
                             <span class="detail-label">Объем</span>
-                            <span class="detail-value">[[ ram.size ]] GB</span>
+                            <span class="detail-value">[[ ram ]] GB</span>
                         </div>
                         <div v-else class="detail-item">
                             <span class="detail-value">Пока данных нет</span>

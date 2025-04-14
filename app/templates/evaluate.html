@@ -3,13 +3,86 @@
 {% block title %}Оценить вашу конфигурацию{% endblock %}
 
 {% block content %}
-    <section>
-        <h2>Оценить вашу конфигурацию</h2>
-        <form>
-            <select v-model="selectedCpu">
-                <option v-for="cpu in cpus" :value="cpu.name">{{ cpu.name }}</option>
-            </select>
-            <button type="submit">Оценить</button>
-        </form>
-    </section>
+  <section>
+    <div id="evaluate">
+      <h2>Оценить вашу конфигурацию</h2>
+      <p v-if="loading">Загрузка данных...</p>
+      <p v-if="error" style="color: red;">Ошибка: Обработки моделью! Пожалуйста, измените данные опроса!</p>
+      
+      <div class="component-name">Процессор</div>
+      <select v-model="selectedCpu">
+          <option disabled value="">Выберите процессор</option>
+          <option 
+              v-for="cpu in cpus_options" 
+              :value="cpu.name" 
+              :key="cpu.id"
+          >
+              [[ cpu.name ]]
+          </option>
+      </select>
+      
+      <!-- Блок оценки CPU -->
+      <div class="performance-rating" v-if="cpuScore">
+          <div class="rating-bar">
+              <div class="rating-label">Производительность CPU:</div>
+              <div class="rating-value">[[ cpuScore ]] %</div>
+              <div class="rating-visual" :class="getRatingClass(cpuScore)" :style="{ width: cpuScore/5 + '%' }"></div>
+          </div>
+          <div class="rating-description">
+              [[ cpuDescription ]]
+          </div>
+      </div>
+      
+      <br><br>
+      
+      <div class="component-name">Видеокарта</div>
+      <select v-model="selectedGpu">
+          <option disabled value="">Выберите видеокарту</option>
+          <option 
+              v-for="gpu in gpus_options" 
+              :value="gpu.name" 
+              :key="gpu.id"
+          >
+              [[ gpu.name ]]
+          </option>
+      </select>
+      
+      <!-- Блок оценки GPU -->
+      <div class="performance-rating" v-if="gpuScore">
+            <div class="rating-bar">
+                <div class="rating-label">Производительность GPU:</div>
+                <div class="rating-value">[[ gpuScore ]] %</div>
+                <div class="rating-visual" :class="getRatingClass(gpuScore)" :style="{ width: gpuScore/5 + '%' }"></div>
+            </div>
+            <div class="rating-description">
+                [[ gpuDescription ]]
+            </div>
+      </div>
+      
+      <br><br>
+      
+      <div class="component-name">Разрешение экрана</div>
+      <div class="resolution-options">
+          <label class="resolution-option">
+              <input type="radio" v-model="selectedResolution" value="full_hd">
+              <span class="radio-custom"></span>
+              <span class="radio-label">Full HD (1920×1080)</span>
+          </label>
+          <label class="resolution-option">
+              <input type="radio" v-model="selectedResolution" value="quad_hd">
+              <span class="radio-custom"></span>
+              <span class="radio-label">Quad HD (2560×1440)</span>
+          </label>
+          <label class="resolution-option">
+              <input type="radio" v-model="selectedResolution" value="ultra_hd">
+              <span class="radio-custom"></span>
+              <span class="radio-label">Ultra HD (3840×2160)</span>
+          </label>
+      </div>
+      
+      <br><br>
+      
+      <button class="evaluate-button" @click="submitForm">Оценить конфигурацию</button>
+  </div>
+  </section>
 {% endblock %}

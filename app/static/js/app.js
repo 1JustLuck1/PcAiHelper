@@ -13,8 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             { id: "3d", text: "3D-рендер и анимация" },
                             { id: "video", text: "Видеомонтаж" },
                             { id: "gaming", text: "Гейминг" },
-                            { id: "ml", text: "Машинное обучение" }
-                        ]
+                            { id: "ml", text: "Машинное обучение" },
+                            { id: "office", text: "Офисная работа" }
+                        ],
+                        hint: "Сфера деятельности, для которой вы планируете собирать конфигурацию."
                     },
                     {
                         id: 2,
@@ -24,16 +26,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             { id: "base", text: "Базовый" },
                             { id: "medium", text: "Средний" },
                             { id: "max", text: "Максимальный" }
-                        ]
+                        ],
+                        hint: "Бюжет определяет, какие компоненты вы можете приобрести. С учетом разницы в курсах валют - проще учитывать стоимсть в долларах. Минимальный < 750$ , Базовый ~ 1100$, Средний ~ 1500$, Максимамальный 1700$+"
                     },
                     {
                         id: 3,
-                        text: "Целевое разрешение монитора, на котором будете работать?",
+                        text: "Целевое разрешение, в котором будете работать?",
                         options: [
                             { id: "fullhd", text: "1920x1080 (FullHD)" },
                             { id: "quadhd", text: "2560x1440 (QuadHD)" },
                             { id: "ultrahd", text: "3840x2160 (UltraHD)" }
-                        ]
+                        ],
+                        hint: "Это может быть разрешение, в котоорм играете; разрешение моделей и ассетов, которое ренедерите; разрешение видео, которое монируете"
                     },
                     {
                         id: 4,
@@ -41,7 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         options: [
                             { id: "amd", text: "AMD" },
                             { id: "intel", text: "Intel" }
-                        ]
+                        ],
+                        hint: "Ведор платформы, определеяется производителем центрального процессора"
                     },
                     {
                         id: 5,
@@ -50,24 +55,30 @@ document.addEventListener('DOMContentLoaded', function() {
                             { id: "nvidia", text: "NVIDIA" },
                             { id: "amd", text: "AMD" },
                             { id: "intel", text: "Intel" }
-                        ]
+                        ],
+                        hint: "Ведор платформы, определеяется производителем графического чипа видеокарты"
                     },
                     {
                         id: 6,
-                        text: "Требуется ли запас на будущее? (Небольшое пропорциональное увеличение общей производительности, за увеличение стоимости)",
+                        text: "Требуется ли сборка с небольшим запасом на будущее?",
                         options: [
                             { id: "0", text: "Запас не требуется" },
                             { id: "1", text: "Запас на будущее нужен" }
-                        ]
+                        ],
+                        hint: "Подразумавается, что при выборе запаса на будущее, пользователь получит сборку мощнее на 10-15% по синтетическим показателям PassMark (https://www.passmark.com/)."
                     }
                 ],
+                activeHint: "",
                 cpu: "",
                 gpu: "",
+                ram: "",
                 psu: "",
                 cpudata: [],
                 gpudata: [],
                 cpu_links: [],
-                gpu_links: []
+                gpu_links: [],
+                loading: false,
+                error: null
             }
         },
         created() {
@@ -89,6 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.currentQuestion--;
                 }
             },
+            showHint(hintText) {
+                this.activeHint = hintText;
+            },
             submitSurvey() {
                 const surveyData = {
                     answers: this.selectedAnswers.map((answer, index) => ({
@@ -103,27 +117,120 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify(surveyData),
                 })
                 .then((response) => {
-                    console.log("Response status:", response.status);
+                    if (!response.ok) throw new Error('Ошибка обработки моделью');
                     return response.json();
                 })
                 .then((data) => {
                     console.log("Data received:", data);
                     this.cpu = data.cpu;
                     this.gpu = data.gpu;
+                    this.ram = data.ram;
                     this.cpudata = data.cpud;
                     this.gpudata = data.gpud;
                     this.psu = data.total_tdp;
                     this.cpu_links = data.cpu_links;
                     this.gpu_links = data.gpu_links
                 })
-                .catch(error => console.error("Fetch error:", error));
+                .catch(error => {
+                    this.error = error.message;
+                    console.error('Ошибка', error);
+                });
             }
         }
     }).mount('#configuration');
     
-    // Vue.createApp({
-
-    // }).mount('#evaluate')
+    Vue.createApp({
+        delimiters: ['[[', ']]'],
+        data() {
+            return{
+                cpus_options: [],
+                selectedCpu: "",
+                gpus_options: [],
+                selectedGpu: "",
+                selectedResolution: 'full hd',
+                cpuScore: null,
+                gpuScore: null,
+                cpuDescription: "",
+                gpuDescription: "",
+                loading: false,
+                error: null
+            }
+        },
+        mounted() {
+            this.fetchOptions();
+        },
+        methods: {
+            fetchOptions() {
+                this.loading = true;
+                this.error = null;
+                
+                fetch("/api/cpus")
+                    .then(response => {
+                        if (!response.ok) throw new Error('Ошибка загрузки CPU');
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.cpus_options = data;
+                    })
+                    .catch(error => {
+                        this.error = error.message;
+                        console.error('CPU load error:', error);
+                    });
+                fetch("/api/gpus")
+                    .then(response => {
+                    if (!response.ok) throw new Error('Ошибка загрузки GPU');
+                    return response.json();
+                    })
+                    .then(data => {
+                    this.gpus_options = data;
+                    })
+                    .catch(error => {
+                    this.error = this.error ? this.error + ' | ' + error.message : error.message;
+                    console.error('GPU load error:', error);
+                    })
+                    .finally(() => {
+                    this.loading = false;
+                });
+                
+            },
+            getRatingClass(score) {
+                if (score >= 120) return 'excellent';
+                if (score >= 100) return 'good';
+                if (score >= 80) return 'medium';
+                if (score >= 50) return 'bad';
+                return 'poor';
+            },
+            submitForm() {
+                this.loading = true;
+                this.error = false;
+                
+                // Отправка данных на сервер Flask
+                fetch('api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cpu: this.selectedCpu,
+                        gpu: this.selectedGpu,
+                        resolution: this.selectedResolution
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.loading = false;
+                    this.cpuScore = data.cpu_percent;
+                    this.gpuScore = data.gpu_percent;
+                    this.cpuDescription = data.cpu_quote;
+                    this.gpuDescription = data.gpu_quote
+                })
+                .catch(error => {
+                    this.error = true;
+                    console.error('Error:', error);
+                });
+            }
+        }
+    }).mount('#evaluate')
 
     Vue.createApp({
         delimiters: ['[[', ']]'],
