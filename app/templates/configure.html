@@ -40,7 +40,10 @@
                 <div class="hint-modal" v-if="activeHint" @click.self="activeHint = ''">
                     <div class="hint-content">
                         <p><b>Пояснение</b></p>
-                        <p>[[ activeHint ]]</p>
+                        <div v-html="formatContent(activeHint)">
+                            <p>[[ activeHint ]]</p>
+                        </div>
+                        <br>
                         <button class="default-button" @click="activeHint = ''">Закрыть</button>
                     </div>
                 </div>
@@ -97,6 +100,48 @@
                 </div>
                 
                 <div class="component">
+                    <div class="component-name">Материнская плата</div>
+                    <div class="component-details">
+                        <div v-if="mb_vendor" class="detail-item">
+                            <span class="detail-label">Модель</span>
+                            <span class="detail-value">[[ mb_vendor ]]</span>
+
+                            <div class="detail-item links-row">
+                                <span class="detail-label">Ссылки</span>
+                                <span v-for="link, shop in mb_links" class="detail-value">
+                                    <a :href="link" target="_blank" class="button">[[ shop ]]</a>
+                                </span>
+                            </div>
+
+                        </div>
+                        <div v-else class="detail-item">
+                            <span class="detail-value">Пока данных нет</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component">
+                    <div class="component-name">Охлаждение процессора</div>
+                    <div class="component-details">
+                        <div v-if="cpu_cooler_vendor" class="detail-item">
+                            <span class="detail-label">Модель</span>
+                            <span class="detail-value">[[ cpu_cooler_vendor ]]</span>
+
+                            <div class="detail-item links-row">
+                                <span class="detail-label">Ссылки</span>
+                                <span v-for="link, shop in cpu_cooler_links" class="detail-value">
+                                    <a :href="link" target="_blank" class="button">[[ shop ]]</a>
+                                </span>
+                            </div>
+
+                        </div>
+                        <div v-else class="detail-item">
+                            <span class="detail-value">Пока данных нет</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component">
                     <div class="component-name">Видеокарта</div>
                     <div class="component-details">
                         <div v-if="gpu">
@@ -145,13 +190,28 @@
                             <span class="detail-label">Мощность</span>
                             <span class="detail-value">[[ psu ]] W</span>
                         </div>
+                        <div v-if="psu_vendor" class="detail-item">
+                            <span class="detail-label">Модель БП</span>
+                            <span class="detail-value">[[ psu_vendor ]]</span>
+
+                            <div class="detail-item links-row">
+                                <span class="detail-label">Ссылки</span>
+                                <span v-for="link, shop in psu_links" class="detail-value">
+                                    <a :href="link" target="_blank" class="button">[[ shop ]]</a>
+                                </span>
+                            </div>
+
+                        </div>
                         <div v-else class="detail-item">
                             <span class="detail-value">Пока данных нет</span>
                         </div>
                     </div>
                 </div>
+                
+                <button v-if="cpu && gpu && ram" @click="downloadExcel" class="download-btn">
+                    Скачать список компонентов (Excel)
+                </button>
             </div>
-
         </div>
     </section>
 {% endblock %}

@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             { id: "3d", text: "3D-рендер и анимация" },
                             { id: "video", text: "Видеомонтаж" },
                             { id: "gaming", text: "Гейминг" },
-                            { id: "ml", text: "Машинное обучение" },
-                            { id: "office", text: "Офисная работа" }
+                            { id: "ml", text: "Машинное обучение" }
+                            // { id: "office", text: "Офисная работа" }
                         ],
                         hint: "Сфера деятельности, для которой вы планируете собирать конфигурацию."
                     },
@@ -27,17 +27,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             { id: "medium", text: "Средний" },
                             { id: "max", text: "Максимальный" }
                         ],
-                        hint: "Бюжет определяет, какие компоненты вы можете приобрести. С учетом разницы в курсах валют - проще учитывать стоимсть в долларах. Минимальный < 750$ , Базовый ~ 1100$, Средний ~ 1500$, Максимамальный 1700$+"
+                        hint: "Бюжет определяет, какие компоненты вы можете приобрести.\n<b>Минимальный</b> до ~100тыс. рублей,\n<b>Базовый</b> ~110-140тыс.рублей,\n<b>Средний</b> ~150-200тыс.руб,\n<b>Максимальный</b> ~250тыс.руб и более"
                     },
                     {
                         id: 3,
-                        text: "Целевое разрешение, в котором будете работать?",
+                        text: "Уровень решаемых задач в вашей деятельности?",
                         options: [
-                            { id: "fullhd", text: "1920x1080 (FullHD)" },
-                            { id: "quadhd", text: "2560x1440 (QuadHD)" },
-                            { id: "ultrahd", text: "3840x2160 (UltraHD)" }
+                            { id: "fullhd", text: "Базовый" },
+                            { id: "quadhd", text: "Продвинутый/Полупрофессиональный" },
+                            { id: "ultrahd", text: "Профессиональный" }
                         ],
-                        hint: "Это может быть разрешение, в котоорм играете; разрешение моделей и ассетов, которое ренедерите; разрешение видео, которое монируете"
+                        hint: "<b>Базовый уровень</b> - самый распространенный, покрывает большество задач обычного пользователя(работа, игры, мультимедия).\n<b>Продвинутый/Полу-профессиональный</b> - уровень задач требующих больше мощностей, в виду специфики рабочей деятельности.\n<b>Профессиональный</b> - задачи максимальной сложности, которые требуют максимальной производительности."
                     },
                     {
                         id: 4,
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             { id: "amd", text: "AMD" },
                             { id: "intel", text: "Intel" }
                         ],
-                        hint: "Ведор платформы, определеяется производителем центрального процессора"
+                        hint: "Ведор платформы, определеяется производителем центрального процессора или сокетом материнской платы"
                     },
                     {
                         id: 5,
@@ -60,12 +60,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     {
                         id: 6,
-                        text: "Требуется ли сборка с небольшим запасом на будущее?",
+                        text: "Нужен ли небольшой запас на будущее?",
                         options: [
                             { id: "0", text: "Запас не требуется" },
                             { id: "1", text: "Запас на будущее нужен" }
                         ],
                         hint: "Подразумавается, что при выборе запаса на будущее, пользователь получит сборку мощнее на 10-15% по синтетическим показателям PassMark (https://www.passmark.com/)."
+                    },
+                    {
+                        id: 7,
+                        text: "Какой тип видеокарты требуется?",
+                        options: [
+                            { id: "uni", text: "Универсальная" },
+                            { id: "professonal", text: "Профессиональная" }
+                            // { id: "office", text: "Офисная" }
+                        ],
+                        hint: "Универсальная подойдет для задач широкого профиля. \nПрофессиональная создана специально для вычислиния множества парралельных опрераций в сферах, где это требуется. \nОфисная это доступный вариант для обычных рабочих задач и работы в нетребовальтехных приложениях."
                     }
                 ],
                 activeHint: "",
@@ -73,10 +83,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 gpu: "",
                 ram: "",
                 psu: "",
+                psu_vendor: "",
+                mb_vendor: "",
+                cpu_cooler_vendor: "",
                 cpudata: [],
                 gpudata: [],
                 cpu_links: [],
                 gpu_links: [],
+                psu_links: [],
+                mb_links: [],
+                cpu_cooler_links: [],
                 loading: false,
                 error: null
             }
@@ -103,6 +119,9 @@ document.addEventListener('DOMContentLoaded', function() {
             showHint(hintText) {
                 this.activeHint = hintText;
             },
+            formatContent(text) {
+                return text.replace(/\n/g, '<br>');
+            },
             submitSurvey() {
                 const surveyData = {
                     answers: this.selectedAnswers.map((answer, index) => ({
@@ -128,12 +147,53 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.cpudata = data.cpud;
                     this.gpudata = data.gpud;
                     this.psu = data.total_tdp;
+                    this.psu_vendor = data.psu_vendor;
+                    this.mb_vendor = data.mb_vendor;
+                    this.cpu_cooler_vendor = data.cpu_cooler_vendor;
                     this.cpu_links = data.cpu_links;
-                    this.gpu_links = data.gpu_links
+                    this.gpu_links = data.gpu_links;
+                    this.psu_links = data.psu_links;
+                    this.mb_links = data.mb_links;
+                    this.cpu_cooler_links = data.cpu_cooler_links;
                 })
                 .catch(error => {
                     this.error = error.message;
                     console.error('Ошибка', error);
+                });
+            },
+            downloadExcel() {
+                // Подготавливаем только данные компонентов
+                const exportData = {
+                    cpu: this.cpu,
+                    gpu: this.gpu,
+                    ram: this.ram,
+                    psu: this.psu,
+                    psu_vendor: this.psu_vendor,
+                    mb_vendor: this.mb_vendor,
+                    cpu_cooler_vendor: this.cpu_cooler_vendor
+                };
+        
+                fetch("/download-excel", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(exportData),
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка генерации Excel');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'pc_components.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при генерации Excel файла');
                 });
             }
         }
@@ -147,7 +207,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedCpu: "",
                 gpus_options: [],
                 selectedGpu: "",
-                selectedResolution: 'full hd',
+                selectedSphere: 'gaming',
+                selectedLvl: 'base',
                 cpuScore: null,
                 gpuScore: null,
                 cpuDescription: "",
@@ -213,7 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({
                         cpu: this.selectedCpu,
                         gpu: this.selectedGpu,
-                        resolution: this.selectedResolution
+                        sphere: this.selectedSphere,
+                        lvl: this.selectedLvl
                     })
                 })
                 .then(response => response.json())

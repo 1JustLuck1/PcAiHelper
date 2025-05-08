@@ -345,6 +345,7 @@ padding: 10px 20px;
 }
 /* Стили только для блока с ссылками */
 .links-row {
+    display: flex;
     margin-bottom: 15px; /* Увеличиваем отступ снизу */
 }
 
@@ -354,6 +355,7 @@ padding: 10px 20px;
 
 .links-row .detail-value {
     display: inline-flex; /* Размещаем ссылки в ряд */
+    margin-top: 30px;
     flex-wrap: wrap; /* Разрешаем перенос при нехватке места */
     gap: 8px; /* Отступ между ссылками */
 }
@@ -530,4 +532,19 @@ padding: 10px 20px;
     background-color: #228b22;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.download-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.download-btn:hover {
+    background-color: #45a049;
 }

@@ -9,7 +9,7 @@
       <p v-if="loading">Загрузка данных...</p>
       <p v-if="error" style="color: red;">Ошибка: Обработки моделью! Пожалуйста, измените данные опроса!</p>
       
-      <div class="component-name">Процессор</div>
+      <div class="component-name">Ваш текущий процессор</div>
       <select v-model="selectedCpu">
           <option disabled value="">Выберите процессор</option>
           <option 
@@ -35,7 +35,7 @@
       
       <br><br>
       
-      <div class="component-name">Видеокарта</div>
+      <div class="component-name">Ваша текущая видеокарта</div>
       <select v-model="selectedGpu">
           <option disabled value="">Выберите видеокарту</option>
           <option 
@@ -61,22 +61,48 @@
       
       <br><br>
       
-      <div class="component-name">Разрешение экрана</div>
+      <div class="component-name">Сфера деятельности</div>
       <div class="resolution-options">
           <label class="resolution-option">
-              <input type="radio" v-model="selectedResolution" value="full_hd">
+              <input type="radio" v-model="selectedSphere" value="gaming">
               <span class="radio-custom"></span>
-              <span class="radio-label">Full HD (1920×1080)</span>
+              <span class="radio-label">Гейминг</span>
           </label>
           <label class="resolution-option">
-              <input type="radio" v-model="selectedResolution" value="quad_hd">
+              <input type="radio" v-model="selectedSphere" value="3d">
               <span class="radio-custom"></span>
-              <span class="radio-label">Quad HD (2560×1440)</span>
+              <span class="radio-label">3D-моделирование</span>
           </label>
           <label class="resolution-option">
-              <input type="radio" v-model="selectedResolution" value="ultra_hd">
+              <input type="radio" v-model="selectedSphere" value="video">
               <span class="radio-custom"></span>
-              <span class="radio-label">Ultra HD (3840×2160)</span>
+              <span class="radio-label">Видеомонтаж</span>
+          </label>
+          <label class="resolution-option">
+            <input type="radio" v-model="selectedSphere" value="ml">
+            <span class="radio-custom"></span>
+            <span class="radio-label">Машинное обучение</span>
+        </label>
+      </div>
+      
+      <br><br>
+
+      <div class="component-name">Целевой уровень производительности</div>
+      <div class="resolution-options">
+          <label class="resolution-option">
+              <input type="radio" v-model="selectedLvl" value="base">
+              <span class="radio-custom"></span>
+              <span class="radio-label">Базовый</span>
+          </label>
+          <label class="resolution-option">
+              <input type="radio" v-model="selectedLvl" value="advanced">
+              <span class="radio-custom"></span>
+              <span class="radio-label">Продвинутый</span>
+          </label>
+          <label class="resolution-option">
+              <input type="radio" v-model="selectedLvl" value="pro">
+              <span class="radio-custom"></span>
+              <span class="radio-label">Профессиональный</span>
           </label>
       </div>
       
