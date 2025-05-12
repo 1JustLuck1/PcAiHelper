@@ -91,6 +91,7 @@
                                 <span v-for="link, shop in cpu_links" class="detail-value">
                                     <a :href="link" target="_blank" class="button">[[ shop ]]</a>
                                 </span>
+                                <a v-for="item, name in prices"> [[ item ]]</a>
                             </div>
                         </div>
                         <div v-else class="detail-item">

@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 gpu_links: [],
                 psu_links: [],
                 mb_links: [],
+                prices: [],
                 cpu_cooler_links: [],
                 loading: false,
                 error: null
@@ -154,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.gpu_links = data.gpu_links;
                     this.psu_links = data.psu_links;
                     this.mb_links = data.mb_links;
+                    this.prices = data.prices;
                     this.cpu_cooler_links = data.cpu_cooler_links;
                 })
                 .catch(error => {
